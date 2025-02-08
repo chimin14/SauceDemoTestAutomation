@@ -3,6 +3,7 @@ import { By, until } from "selenium-webdriver";
 export default class CheckoutPage {
     constructor(driver) {
         this.driver = driver;
+        this.pageTitle = By.css(".title");
         this.firstNameField = By.id("first-name");
         this.lastNameField = By.id("last-name");
         this.postalCodeField = By.id("postal-code");
@@ -12,11 +13,45 @@ export default class CheckoutPage {
         this.checkoutItems = By.css(".inventory_item_name");
     }
 
+    async isOnCheckoutInformationPage() {
+        try {
+            let titleElement = await this.driver.wait(until.elementLocated(this.pageTitle), 5000);
+            let titleText = await titleElement.getText();
+            return titleText.includes("Checkout: Your Information");
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async isOnCheckoutOverviewPage() {
+        try {
+            let titleElement = await this.driver.wait(until.elementLocated(this.pageTitle), 5000);
+            let titleText = await titleElement.getText();
+            return titleText.includes("Checkout: Overview");
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async isOnCheckoutCompletePage() {
+        try {
+            let titleElement = await this.driver.wait(until.elementLocated(this.pageTitle), 5000);
+            let titleText = await titleElement.getText();
+            return titleText.includes("Checkout: Complete!");
+        } catch (error) {
+            return false;
+        }
+    }
+
     async fillCheckoutInfo(firstName, lastName, postalCode) {
         await this.driver.findElement(this.firstNameField).sendKeys(firstName);
         await this.driver.findElement(this.lastNameField).sendKeys(lastName);
         await this.driver.findElement(this.postalCodeField).sendKeys(postalCode);
-        await this.driver.findElement(this.continueButton).click();
+    }
+
+    async clickContinue() {
+        let continueButton = await this.driver.wait(until.elementLocated(this.continueButton), 5000);
+        await continueButton.click();
         await this.driver.wait(until.urlContains("checkout-step-two.html"), 5000);
     }
 

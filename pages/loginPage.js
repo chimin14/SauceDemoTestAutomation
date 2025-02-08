@@ -13,53 +13,42 @@ export default class LoginPage {
         this.closeButton = By.css(".error-button");
         this.menuButton = By.id("react-burger-menu-btn");
         this.logoutButton = By.id("logout_sidebar_link");
+        this.menuPanel = By.css(".bm-menu-wrap");
     }
 
- 
     async open() {
         await this.driver.get(this.url);
         await this.driver.wait(until.elementLocated(this.usernameField), 5000);
     }
 
-  
     async login(username, password) {
-        await this.driver.findElement(this.usernameField).clear();
-        await this.driver.findElement(this.usernameField).sendKeys(username);
-        await this.driver.findElement(this.passwordField).clear();
-        await this.driver.findElement(this.passwordField).sendKeys(password);
+        let usernameInput = await this.driver.findElement(this.usernameField);
+        let passwordInput = await this.driver.findElement(this.passwordField);
+
+        await usernameInput.clear();
+        await usernameInput.sendKeys(username);
+        await passwordInput.clear();
+        await passwordInput.sendKeys(password);
+
         await this.driver.findElement(this.loginButton).click();
     }
 
-    
     async getErrorMessage() {
         await this.driver.wait(until.elementLocated(this.errorMessage), 5000);
         return await this.driver.findElement(this.errorMessage).getText();
     }
 
-  
     async getUsernameErrorIcon() {
-        try {
-            await this.driver.wait(until.elementLocated(this.errorIconUsername), 5000);
-            return true;
-        } catch (error) {
-            return false;
-        }
+        return await this.isElementVisible(this.errorIconUsername);
     }
-
 
     async getPasswordErrorIcon() {
-        try {
-            await this.driver.wait(until.elementLocated(this.errorIconPassword), 5000);
-            return true;
-        } catch (error) {
-            return false;
-        }
+        return await this.isElementVisible(this.errorIconPassword);
     }
 
- 
     async clickCloseButton() {
         try {
-            let closeButton = await this.driver.findElement(this.closeButton);
+            let closeButton = await this.driver.wait(until.elementLocated(this.closeButton), 5000);
             await closeButton.click();
             await this.driver.wait(until.stalenessOf(closeButton), 5000);
         } catch (error) {
@@ -67,22 +56,33 @@ export default class LoginPage {
         }
     }
 
-   
-    async logout() {
+    async openMenu() {
         let menuButton = await this.driver.wait(until.elementLocated(this.menuButton), 5000);
         await menuButton.click();
+        await this.driver.wait(until.elementLocated(this.menuPanel), 5000);
+        await this.driver.wait(until.elementIsVisible(await this.driver.findElement(this.menuPanel)), 5000);
+    }
 
+    async logout() {
+        await this.openMenu();
         let logoutButton = await this.driver.wait(until.elementLocated(this.logoutButton), 5000);
         await this.driver.wait(until.elementIsVisible(logoutButton), 5000);
         await logoutButton.click();
-
         await this.driver.wait(until.elementLocated(this.loginButton), 5000);
     }
 
-    
     async isLoginPageDisplayed() {
+        return await this.isElementVisible(this.loginButton);
+    }
+
+    async isErrorMessageDisplayed() {
+        return await this.isElementVisible(this.errorMessage);
+    }
+
+    async isElementVisible(locator) {
         try {
-            return await this.driver.findElement(this.loginButton).isDisplayed();
+            let element = await this.driver.findElement(locator);
+            return await element.isDisplayed();
         } catch (error) {
             return false;
         }

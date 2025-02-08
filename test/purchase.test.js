@@ -23,29 +23,37 @@ describe("Purchase Flow Tests", function () {
         await driver.quit();
     });
 
-    it("should complete a purchase successfully", async function () {
+    it("Test 3: Kupovina proizvoda", async function () {
         await loginPage.login("standard_user", "secret_sauce");
-
-        
         expect(await productsPage.isOnProductsPage()).to.be.true;
 
         await productsPage.addProductsToCart(2);
-        await productsPage.goToCart();
+        
+        // 🔥 FIX: Ensure `getCartItemCount()` returns a number, not a string
+        let cartCount = await productsPage.getCartItemCount();
+        expect(cartCount).to.equal(2);  
 
-        expect((await cartPage.getCartItems()).length).to.equal(2);
+        await productsPage.goToCart();
+        expect(await cartPage.isOnCartPage()).to.be.true;
+
+        let cartItems = await cartPage.getCartItems();
+        expect(cartItems.length).to.equal(2);
 
         await cartPage.proceedToCheckout();
-        await checkoutPage.fillCheckoutInfo("Dzido", "Test", "71000");
+        expect(await checkoutPage.isOnCheckoutInformationPage()).to.be.true;
 
-        expect((await checkoutPage.getCheckoutItems()).length).to.equal(2);
+        await checkoutPage.fillCheckoutInfo("Dzido", "Test", "71000");
+        await checkoutPage.clickContinue();
+
+        expect(await checkoutPage.isOnCheckoutOverviewPage()).to.be.true;
+
+        let checkoutItems = await checkoutPage.getCheckoutItems();
+        expect(checkoutItems.length).to.equal(2);
 
         await checkoutPage.completePurchase();
-        expect((await checkoutPage.getConfirmationMessage()).toLowerCase()).to.include("thank you for your order!");
+        expect(await checkoutPage.isOnCheckoutCompletePage()).to.be.true;
 
-        console.log("Step 12: Logout from menu");
         await loginPage.logout();
-
-        console.log("Step 13: Verify return to Login page");
         expect(await loginPage.isLoginPageDisplayed()).to.be.true;
     });
 });
