@@ -11,6 +11,7 @@ describe("Purchase Flow Tests", function () {
 
     beforeEach(async function () {
         driver = await new Builder().forBrowser("chrome").build();
+        await driver.manage().window().maximize();
         loginPage = new LoginPage(driver);
         productsPage = new ProductsPage(driver);
         cartPage = new CartPage(driver);
@@ -24,24 +25,22 @@ describe("Purchase Flow Tests", function () {
 
     it("should complete a purchase successfully", async function () {
         await loginPage.login("standard_user", "secret_sauce");
-        let pageTitle = await productsPage.isOnProductsPage();
-        expect(pageTitle).to.include("Products");
+
+        
+        expect(await productsPage.isOnProductsPage()).to.be.true;
 
         await productsPage.addProductsToCart(2);
         await productsPage.goToCart();
 
-        let cartItems = await cartPage.getCartItems();
-        expect(cartItems.length).to.equal(2);
+        expect((await cartPage.getCartItems()).length).to.equal(2);
 
         await cartPage.proceedToCheckout();
         await checkoutPage.fillCheckoutInfo("Dzido", "Test", "71000");
 
-        let checkoutItems = await checkoutPage.getCheckoutItems();
-        expect(checkoutItems.length).to.equal(2);
+        expect((await checkoutPage.getCheckoutItems()).length).to.equal(2);
 
         await checkoutPage.completePurchase();
-        let confirmationMessage = await checkoutPage.getConfirmationMessage();
-        expect(confirmationMessage.toLowerCase()).to.include("thank you for your order!");
+        expect((await checkoutPage.getConfirmationMessage()).toLowerCase()).to.include("thank you for your order!");
 
         console.log("Step 12: Logout from menu");
         await loginPage.logout();

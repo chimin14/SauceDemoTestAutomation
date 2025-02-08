@@ -8,6 +8,7 @@ describe("SauceDemo Login Tests (Optimized)", function () {
 
     beforeEach(async function () {
         driver = await new Builder().forBrowser("chrome").build();
+        await driver.manage().window().maximize();
         loginPage = new LoginPage(driver);
         await loginPage.open();
     });

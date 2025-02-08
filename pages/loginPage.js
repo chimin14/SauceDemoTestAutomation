@@ -15,13 +15,13 @@ export default class LoginPage {
         this.logoutButton = By.id("logout_sidebar_link");
     }
 
-    // ✅ Open the login page
+ 
     async open() {
         await this.driver.get(this.url);
         await this.driver.wait(until.elementLocated(this.usernameField), 5000);
     }
 
-    // ✅ Perform login with given credentials
+  
     async login(username, password) {
         await this.driver.findElement(this.usernameField).clear();
         await this.driver.findElement(this.usernameField).sendKeys(username);
@@ -30,13 +30,13 @@ export default class LoginPage {
         await this.driver.findElement(this.loginButton).click();
     }
 
-    // ✅ Get the error message text
+    
     async getErrorMessage() {
         await this.driver.wait(until.elementLocated(this.errorMessage), 5000);
         return await this.driver.findElement(this.errorMessage).getText();
     }
 
-    // ✅ Check if username field error icon is displayed
+  
     async getUsernameErrorIcon() {
         try {
             await this.driver.wait(until.elementLocated(this.errorIconUsername), 5000);
@@ -46,7 +46,7 @@ export default class LoginPage {
         }
     }
 
-    // ✅ Check if password field error icon is displayed
+
     async getPasswordErrorIcon() {
         try {
             await this.driver.wait(until.elementLocated(this.errorIconPassword), 5000);
@@ -56,7 +56,7 @@ export default class LoginPage {
         }
     }
 
-    // ✅ Close the error message
+ 
     async clickCloseButton() {
         try {
             let closeButton = await this.driver.findElement(this.closeButton);
@@ -67,7 +67,7 @@ export default class LoginPage {
         }
     }
 
-    // ✅ Log out from the system
+   
     async logout() {
         let menuButton = await this.driver.wait(until.elementLocated(this.menuButton), 5000);
         await menuButton.click();
@@ -79,7 +79,7 @@ export default class LoginPage {
         await this.driver.wait(until.elementLocated(this.loginButton), 5000);
     }
 
-    // ✅ Check if login page is displayed
+    
     async isLoginPageDisplayed() {
         try {
             return await this.driver.findElement(this.loginButton).isDisplayed();
