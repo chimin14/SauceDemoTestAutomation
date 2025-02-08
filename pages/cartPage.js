@@ -1,25 +1,20 @@
-const { By, until } = require("selenium-webdriver");
+import { By, until } from "selenium-webdriver";
 
-class CartPage {
+export default class CartPage {
     constructor(driver) {
         this.driver = driver;
-        this.cartItems = By.css(".cart_item");
         this.checkoutButton = By.id("checkout");
+        this.cartItems = By.css(".inventory_item_name");
     }
 
-    async isOnCartPage() {
-        return await this.driver.findElement(By.css(".title")).getText();
-    }
-
-    async getCartItemsCount() {
-        let items = await this.driver.findElements(this.cartItems);
-        return items.length;
+    async getCartItems() {
+        await this.driver.wait(until.elementsLocated(this.cartItems), 5000);
+        return await this.driver.findElements(this.cartItems);
     }
 
     async proceedToCheckout() {
-        await this.driver.wait(until.elementLocated(this.checkoutButton), 5000); // Sačekaj da dugme bude vidljivo
-        await this.driver.findElement(this.checkoutButton).click();
+        let checkoutButton = await this.driver.wait(until.elementLocated(this.checkoutButton), 5000);
+        await checkoutButton.click();
+        await this.driver.wait(until.urlContains("checkout-step-one.html"), 5000);
     }
 }
-
-module.exports = CartPage;

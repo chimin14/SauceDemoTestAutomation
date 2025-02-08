@@ -1,27 +1,26 @@
-const { By } = require("selenium-webdriver");
+import { By, until } from "selenium-webdriver";
 
-class ProductsPage {
+export default class ProductsPage {
     constructor(driver) {
         this.driver = driver;
-        this.productTitle = By.css(".title");
-        this.addToCartButtons = By.css(".btn_inventory");
-        this.cartIcon = By.css(".shopping_cart_badge");
+        this.pageTitle = By.css(".title");
+        this.cartIcon = By.css(".shopping_cart_link");
     }
 
     async isOnProductsPage() {
-        return await this.driver.findElement(this.productTitle).getText();
+        await this.driver.wait(until.elementLocated(this.pageTitle), 5000);
+        return await this.driver.findElement(this.pageTitle).getText();
     }
 
-    async addProductsToCart(numberOfProducts) {
-        let buttons = await this.driver.findElements(this.addToCartButtons);
-        for (let i = 0; i < numberOfProducts; i++) {
-            await buttons[i].click();
+    async addProductsToCart(count) {
+        let addToCartButtons = await this.driver.findElements(By.css(".btn_inventory"));
+        for (let i = 0; i < count; i++) {
+            await addToCartButtons[i].click();
         }
     }
 
-    async getCartItemCount() {
-        return await this.driver.findElement(this.cartIcon).getText();
+    async goToCart() {
+        await this.driver.findElement(this.cartIcon).click();
+        await this.driver.wait(until.urlContains("cart.html"), 5000);
     }
 }
-
-module.exports = ProductsPage;
